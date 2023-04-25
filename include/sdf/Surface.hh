@@ -155,6 +155,34 @@ namespace sdf
     GZ_UTILS_IMPL_PTR(dataPtr)
   };
 
+  /// @brief Define soft contact parameters
+  class SDFORMAT_VISIBLE SoftContact
+  {
+    public: SoftContact();
+
+    public: Errors Load(ElementPtr _sdf);
+
+    public: const sdf::ElementPtr Element() const;
+
+    public: double BoneAttachement() const;
+
+    public: void SetBoneAttachement(const double _boneAttachement);
+
+    public: double Stiffness() const;
+
+    public: void SetStiffness(const double _stiffness);
+
+    public: double Damping() const;
+
+    public: void SetDamping(const double _damping);
+
+    // public: double FleshMassFraction() const;
+
+    // public: void SetFleshMassFraction(const double _fleshMassFraction);
+
+    GZ_UTILS_IMPL_PTR(dataPtr)
+  };
+
   /// \brief Surface information for a collision.
   class SDFORMAT_VISIBLE Surface
   {
@@ -192,6 +220,9 @@ namespace sdf
     /// \brief Set the associated friction object.
     /// \param[in] _friction The friction object.
     public: void SetFriction(const sdf::Friction &_friction);
+
+    public: const sdf::SoftContact *SoftContact() const;
+    public: void SetSoftContact(const sdf::SoftContact &_softContact);
 
     /// \brief Create and return an SDF element filled with data from this
     /// surface.

@@ -80,7 +80,17 @@ class sdf::Surface::Implementation
   /// \brief The object storing contact parameters
   public: sdf::Contact contact;
 
+  public: sdf::SoftContact softContact;
+
   /// \brief The SDF element pointer used during load.
+  public: sdf::ElementPtr sdf{nullptr};
+};
+
+class sdf::SoftContact::Implementation
+{
+  public: double boneAttachment = 100;
+  public: double stiffness = 100;
+  public: double damping = 1;
   public: sdf::ElementPtr sdf{nullptr};
 };
 
@@ -350,6 +360,12 @@ Errors Surface::Load(ElementPtr _sdf)
     errors.insert(errors.end(), err.begin(), err.end());
   }
 
+  if (_sdf->HasElement("soft_contact"))
+  {
+    Errors err = this->dataPtr->softContact.Load(_sdf->GetElement("soft_contact"));
+    errors.insert(errors.end(), err.begin(), err.end());
+  }
+
   if (_sdf->HasElement("friction"))
   {
     Errors err = this->dataPtr->friction.Load(_sdf->GetElement("friction"));
@@ -390,6 +406,18 @@ void Surface::SetContact(const sdf::Contact &_contact)
 }
 
 /////////////////////////////////////////////////
+void Surface::SetSoftContact(const sdf::SoftContact &_softContact)
+{
+  this->dataPtr->softContact = _softContact;
+}
+
+/////////////////////////////////////////////////
+const sdf::SoftContact *Surface::SoftContact() const
+{
+  return &this->dataPtr->softContact;
+}
+
+/////////////////////////////////////////////////
 sdf::ElementPtr Surface::ToElement() const
 {
   sdf::ElementPtr elem(new sdf::Element);
@@ -410,3 +438,86 @@ sdf::ElementPtr Surface::ToElement() const
 
   return elem;
 }
+
+SoftContact::SoftContact()
+  : dataPtr(gz::utils::MakeImpl<Implementation>())
+{}
+
+Errors SoftContact::Load(ElementPtr _sdf)
+{
+  Errors errors;
+
+  this->dataPtr->sdf = _sdf;
+
+  // Check that sdf is a valid pointer
+  if (!_sdf)
+  {
+    errors.push_back({ErrorCode::ELEMENT_MISSING,
+        "Attempting to load a Surface, but the provided SDF "
+        "element is null."});
+    return errors;
+  }
+
+  // Check that the provided SDF element is a <surface>
+  // This is an error that cannot be recovered, so return an error.
+  if (_sdf->GetName() != "soft_contact")
+  {
+    errors.push_back({ErrorCode::ELEMENT_INCORRECT_TYPE,
+        "Attempting to load a SoftContact, but the provided SDF element is not a "
+        "<soft_contact>."});
+    return errors;
+  }
+
+  if (_sdf->HasElement("bone_attachment"))
+  {
+    this->dataPtr->boneAttachment = _sdf->Get<double>("bone_attachment");
+  }
+
+  if (_sdf->HasElement("stiffness"))
+  {
+    this->dataPtr->stiffness = _sdf->Get<double>("stiffness");
+  }
+
+  if (_sdf->HasElement("damping"))
+  {
+    this->dataPtr->damping = _sdf->Get<double>("damping");
+  }
+
+  return errors;
+}
+
+const sdf::ElementPtr SoftContact::Element() const
+{
+  return this->dataPtr->sdf;
+}
+
+double SoftContact::BoneAttachement() const
+{
+  return this->dataPtr->boneAttachment;
+}
+
+void SoftContact::SetBoneAttachement(const double _boneAttachement)
+{
+  this->dataPtr->boneAttachment = _boneAttachement;
+}
+
+double SoftContact::Stiffness() const
+{
+  return this->dataPtr->stiffness;
+}
+
+void SoftContact::SetStiffness(const double _stiffness)
+{
+  this->dataPtr->stiffness = _stiffness;
+}
+
+double SoftContact::Damping() const
+{
+ return this->dataPtr->damping;
+}
+
+void SoftContact::SetDamping(const double _damping)
+{
+  this->dataPtr->damping = _damping;
+}
+
