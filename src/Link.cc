@@ -74,6 +74,9 @@ class sdf::Link::Implementation
   /// \brief True if this link should be subject to wind, false otherwise.
   public: bool enableWind = false;
 
+  /// \brief If true, gz-physics will create a softbody (only supported using dartsim) 
+  public: bool softBody = false;
+
   /// \brief Scoped Pose Relative-To graph at the parent model scope.
   public: sdf::ScopedGraph<sdf::PoseRelativeToGraph> poseRelativeToGraph;
 };
@@ -156,6 +159,11 @@ Errors Link::Load(ElementPtr _sdf, const ParserConfig &_config)
   gz::math::Pose3d inertiaPose;
   std::string inertiaFrame = "";
   double mass = 1.0;
+
+  if (_sdf->HasElement("soft_body"))
+  {
+    this->dataPtr->softBody = _sdf->Get<bool>("soft_body", false).first;
+  }
 
   if (_sdf->HasElement("inertial"))
   {
@@ -646,6 +654,18 @@ void Link::SetEnableWind(const bool _enableWind)
   this->dataPtr->enableWind = _enableWind;
 }
 
+/////////////////////////////////////////////////
+bool Link::SoftBody() const
+{
+  return this->dataPtr->softBody;
+}
+
+/////////////////////////////////////////////////
+void Link::SetSoftBody(const bool _softBody)
+{
+  this->dataPtr->softBody = _softBody;
+}
+
 //////////////////////////////////////////////////
 bool Link::AddCollision(const Collision &_collision)
 {
@@ -737,6 +757,8 @@ sdf::ElementPtr Link::ToElement() const
         this->dataPtr->poseRelativeTo);
   }
   poseElem->Set<gz::math::Pose3d>(this->RawPose());
+
+  elem->GetElement("soft_body")->Set(this->dataPtr->softBody);
 
   // inertial
   sdf::ElementPtr inertialElem = elem->GetElement("inertial");

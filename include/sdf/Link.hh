@@ -338,6 +338,16 @@ namespace sdf
     /// \sa Model::SetEnableWind(bool)
     public: void SetEnableWind(bool _enableWind);
 
+    /// \brief Check if this link is a soft body. 
+    /// If true, a soft body will be created (dartsim only).
+    /// \return If true, this link will be a soft body.
+    public: bool SoftBody() const;
+
+    /// \brief Set whether this link is a soft body.
+    /// \param[in] _softBody True or false depending on whether the link is 
+    /// a soft body.
+    public: void SetSoftBody(const bool _softBody);
+
     /// \brief Add a collision to the link.
     /// \param[in] _collision Collision to add.
     /// \return True if successful, false if a collision with the name already
