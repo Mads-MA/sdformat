@@ -164,6 +164,10 @@ namespace sdf
 
     public: const sdf::ElementPtr Element() const;
 
+    public: double FleshMassFraction() const;
+
+    public: void SetFleshMassFraction(const double &_fleshMassFraction);
+
     public: double BoneAttachement() const;
 
     public: void SetBoneAttachement(const double _boneAttachement);

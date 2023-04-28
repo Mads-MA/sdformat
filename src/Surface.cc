@@ -88,9 +88,10 @@ class sdf::Surface::Implementation
 
 class sdf::SoftContact::Implementation
 {
+  public: double fleshMassFraction = 0.05;
   public: double boneAttachment = 100;
   public: double stiffness = 100;
-  public: double damping = 1;
+  public: double damping = 10;
   public: sdf::ElementPtr sdf{nullptr};
 };
 
@@ -468,6 +469,11 @@ Errors SoftContact::Load(ElementPtr _sdf)
     return errors;
   }
 
+  if (_sdf->HasElement("flesh_mass_fraction"))
+  {
+    this->dataPtr->fleshMassFraction = _sdf->Get<double>("flesh_mass_fraction");
+  }
+
   if (_sdf->HasElement("bone_attachment"))
   {
     this->dataPtr->boneAttachment = _sdf->Get<double>("bone_attachment");
@@ -489,6 +495,16 @@ Errors SoftContact::Load(ElementPtr _sdf)
 const sdf::ElementPtr SoftContact::Element() const
 {
   return this->dataPtr->sdf;
+}
+
+double SoftContact::FleshMassFraction() const
+{
+  return this->dataPtr->fleshMassFraction;
+}
+
+void SoftContact::SetFleshMassFraction(const double &_fleshMassFraction)
+{
+  this->dataPtr->fleshMassFraction = _fleshMassFraction;
 }
 
 double SoftContact::BoneAttachement() const
